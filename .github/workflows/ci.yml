@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Emacs
+      uses: purcell/setup-emacs@v2
+      with:
+        version: latest  # You can specify a specific Emacs version if needed
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -y libxml2-dev
+        emacs --version
+
+    - name: Run tests
+      run: |
+        emacs --batch -l ert -l lisp/emacs-email-templates-html.el -f ert-run-tests-batch-and-exit
+
+    - name: Check formatting
+      run: |
+        emacs --batch -l lisp/emacs-email-templates-html.el --eval "(checkdoc-current-buffer t)"
+
